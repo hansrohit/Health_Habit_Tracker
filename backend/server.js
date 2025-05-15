@@ -22,9 +22,11 @@ app.use(
 const userRoutes = require("./Routes/userRoutes");
 const habitRoutes = require("./Routes/habitRoutes");
 const reminderRoutes = require("./Routes/remainderRoutes");
+const aiRoutes = require("./Routes/aiRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/reminder", reminderRoutes);
+app.use("/api/ai", aiRoutes);
 // require("./remainderJob");
 
 app.get("/test", (req, res) => {
