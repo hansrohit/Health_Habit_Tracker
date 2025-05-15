@@ -5,7 +5,7 @@ const Habit = require("../models/habit");
 const router = express.Router();
 dotenv.config();
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyD7spkh25hELJaw7XiBQBiuL6kxIY442Oc",
+  apiKey: process.env.GEMINI_API_KEY,
 });
 const { protect } = require("../middleware/auth");
 
@@ -56,13 +56,3 @@ router.get("/suggestion", protect, async (req, res) => {
 });
 
 module.exports = router;
-
-// async function main() {
-//   const response = await ai.models.generateContent({
-//     model: "gemini-2.0-flash",
-//     contents: "who is the prime minister of America",
-//   });
-//   console.log(response.text);
-// }
-
-// main();
