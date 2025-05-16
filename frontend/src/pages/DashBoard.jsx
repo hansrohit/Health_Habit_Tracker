@@ -7,6 +7,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import ReactMarkdown from "react-markdown";
 import { FaBed, FaTint, FaDumbbell, FaUtensils } from "react-icons/fa";
 import {
   LineChart,
@@ -346,7 +347,25 @@ const Dashboard = () => {
             justify="center"
           >
             <Box w="95%" mt={1} h="270px" overflowY="auto" pr={3}>
-              <Text textAlign="justify">{suggestion}</Text>
+              {/* <Text textAlign="justify" whiteSpace="pre-line">
+                {suggestion}
+              </Text> */}
+              <ReactMarkdown
+                components={{
+                  p: (props) => (
+                    <Text
+                      textAlign="justify"
+                      whiteSpace="pre-line"
+                      {...props}
+                    />
+                  ),
+                  strong: (props) => (
+                    <Text as="span" fontWeight="bold" {...props} />
+                  ),
+                }}
+              >
+                {suggestion}
+              </ReactMarkdown>
             </Box>
           </Flex>
         )}
