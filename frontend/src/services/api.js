@@ -28,6 +28,19 @@ export const getProfile = async (accessToken) => {
   }
 };
 
+export const getSuggestion = async (accessToken) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/ai/suggestion`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log("suggestion error caught in the frontend: ", error);
+  }
+};
+
 export const getUserProfile = async () => {
   const accessToken = localStorage.getItem("accessToken");
 

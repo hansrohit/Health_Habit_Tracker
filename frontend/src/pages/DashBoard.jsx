@@ -23,7 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getWeeklyHabits } from "../services/api";
+import { getWeeklyHabits, getSuggestion } from "../services/api";
 import { useState } from "react";
 
 const todayHabit = (sleepVal, waterVal, workCal, mealCal) => {
@@ -73,12 +73,21 @@ const generateWeeklyChart = (data) => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.auth);
+  const { userToken } = useSelector((state) => state.auth);
   const { sleep } = useSelector((state) => state.habitTracker);
   const { waterIntake } = useSelector((state) => state.habitTracker);
   const { meals } = useSelector((state) => state.habitTracker);
   const { workouts } = useSelector((state) => state.habitTracker);
   const [weeklyData, setWeeklyData] = useState([]);
+  const [suggestion, setSuggestions] = useState("");
+  const handleSuggestion = async () => {
+    console.log(userToken);
 
+    const response = await getSuggestion(userToken);
+    console.log("response: ", response);
+
+    setSuggestions(response.suggestion);
+  };
   let sleepVal = sleep !== "" ? sleep : 0;
   let waterVal = waterIntake !== "" ? waterIntake : 0;
   let mealCal = 0;
@@ -283,6 +292,65 @@ const Dashboard = () => {
           </Box>
         </Flex>
       </VStack>
+      <Flex
+        mt={6}
+        bg="white"
+        shadow="md"
+        minHeight={suggestion ? "385px" : "73px"}
+        borderRadius="2xl"
+        justify={suggestion ? "start" : "center"}
+        alignItems="start"
+        direction="column"
+        pr={10}
+        pl={10}
+        pt={suggestion ? 5 : 0}
+        gap={4}
+      >
+        <Flex
+          justify="space-between"
+          alignItems="center"
+          direction="row"
+          // bg="red"
+          w="full"
+          h="auto"
+          // pl={"8"}
+          borderRadius="xl"
+        >
+          <Text
+            color="blue.700"
+            fontFamily="heading"
+            fontSize={18}
+            fontWeight="bold"
+          >
+            Get Your AI health Suggestion for free!
+          </Text>
+          <Button
+            color="whitesmoke"
+            bg="blue.500"
+            // border="1px solid"
+            // borderColor="green"
+            _hover={{ bg: "blue.600", color: "white" }}
+            fontFamily="heading"
+            fontWeight="bold"
+            onClick={handleSuggestion}
+          >
+            Get Suggestion
+          </Button>
+        </Flex>
+        {suggestion && (
+          <Flex
+            w="full"
+            minH="280px"
+            bg="whitesmoke"
+            borderRadius="xl"
+            justify="center"
+          >
+            <Box w="95%" mt={1} h="270px" overflowY="auto" pr={3}>
+              <Text textAlign="justify">{suggestion}</Text>
+            </Box>
+          </Flex>
+        )}
+      </Flex>
     </Box>
   );
 };
