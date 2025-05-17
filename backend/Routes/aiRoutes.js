@@ -70,7 +70,8 @@ router.get("/suggestion", protect, async (req, res) => {
       7) Don't use any symbols like #,*, etc...
       8) Heading that i've mentioned should be in Bold letters
       9) Everytime you give an response, give the response freashly don't mention as said earlier or mentioned earlier...
-      10) Here are some suggestions based on the provided health data anything like or related to that.
+      10) Here are some suggestions based on the provided health data anything like or related to that don't mention.
+      11) I want you to directly say to the user, without mentioning them as a user, just give the suggestion. Don't mention anything like stating or talking to the third person. Instead use some alternatives like Here's your personalized suggestion. And do casually say since you're some age/weight/height you need to improve or avoid these activities like that say in the response casually talking to them directly...
       `;
 
     console.log(prompt);
