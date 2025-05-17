@@ -258,4 +258,90 @@ router.post("/logout", async (req, res) => {
   }
 });
 
+router.put("/score", protect, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const today = moment().startOf("day").toDate();
+    const tomorrow = moment().startOf("day").toDate();
+    const response = await habit.findOne({
+      user: userId,
+      date: { $gte: today, $lte: tomorrow },
+    });
+    if (!response) {
+      const score = 0;
+      return res.status(404).json({ message: "habit not found", data: score });
+    }
+
+    const sleep = response.sleep;
+    const water = response.water;
+    const meals = response.meals;
+    const workout = response.workout;
+
+    let sleepScore = 0;
+    if (sleep >= 7 && sleep <= 9) sleepScore = 25;
+    else if ((sleep >= 6 && sleep < 7) || (sleep > 9 && sleep <= 11))
+      sleepScore = 20;
+    else if ((sleep >= 5 && sleep < 6) || (sleep > 11 && sleep <= 13))
+      sleepScore = 15;
+    else if ((sleep >= 4 && sleep < 5) || (sleep >= 14 && sleep < 15))
+      sleepScore = 9;
+    else if (sleep == 0) sleepScore = 0;
+    else sleepScore = 5;
+
+    let waterScore = 0;
+
+    if (water == 0) waterScore = 0;
+    else if (water >= 3 && water <= 3.7) waterScore = 25;
+    else if ((water >= 2.5 && water < 3) || (water >= 3.7 && water <= 4.5))
+      waterScore = 22;
+    else if (water >= 2 && water < 2.5) waterScore = 18;
+    else if (water >= 1.5 && water < 2) waterScore = 14;
+    else if (water >= 1 && water < 1.5) waterScore = 9;
+    else waterScore = 5;
+
+    let mealScore = 0;
+    let mealSum = 0;
+    const mealLen = mealScore.length;
+    if (mealLen > 0) {
+      mealSum = meals.reduce((sum, meal) => sum + meal.calorie, 0);
+
+      if (mealSum >= 1800 && mealSum <= 2200) {
+        mealScore = 25;
+      } else if (mealSum < 1800) {
+        mealScore = (mealSum / 1800) * 25;
+      } else if (mealSum > 2200) {
+        mealScore = (2200 / mealSum) * 25;
+      }
+    }
+
+    let workoutScore = 0;
+    let workTime = 0;
+    let workCalorie = 0;
+    const workoutLen = workout.length;
+    if (workoutLen > 0) {
+      workTime = workout.reduce((sum, workout) => sum + workout.time, 0);
+      workCalorie = workout.reduce(
+        (sum, workout) => sum + workout.calorieBurnt,
+        0
+      );
+
+      const timeScore = (workTime / 45) * 100;
+      const calorieScore = (workCalorie / 250) * 100;
+
+      workoutScore = timeScore * 0.5 + calorieScore * 0.5;
+      if (workoutScore > 100) workoutScore = 100;
+
+      workoutScore = workoutScore * 0.25;
+
+      const totalScore = sleepScore + waterScore + mealScore + workoutScore;
+      return res
+        .status(200)
+        .json({ message: "score data successfully fetched", data: totalScore });
+    }
+  } catch (error) {
+    console.log("score backend error: ", error);
+    res.status(500).json({ message: "error in the score base", error: error });
+  }
+});
+
 module.exports = router;
