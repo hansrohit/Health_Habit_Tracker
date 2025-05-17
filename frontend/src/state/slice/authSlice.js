@@ -63,8 +63,6 @@ const authSlice = createSlice({
     updateProfile: (state, action) => {
       state.userInfo.user = { ...state.userInfo.user, ...action.payload };
       localStorage.setItem("userInfo", JSON.stringify(state.userInfo));
-      // const user=action.payload;
-      // localStorage.setItem("userProfile", JSON.stringify(action.payload));
     },
   },
 });

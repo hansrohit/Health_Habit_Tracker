@@ -10,7 +10,7 @@ import {
   HStack,
   useToast,
 } from "@chakra-ui/react";
-import { habitInput } from "../services/api";
+import { getScore, habitInput } from "../services/api";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -24,8 +24,7 @@ const TrackerPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const accessToken = localStorage.getItem("userToken");
-  // console.log(accessToken);
+  const { userToken } = useSelector((state) => state.auth);
 
   let user = null;
   if (userInfo) {
@@ -102,7 +101,7 @@ const TrackerPage = () => {
       meals: meals.filter((m) => m.meal && m.calorie),
       workouts: workouts.filter((w) => w.workout && w.time && w.calorieBurnt),
     };
-    console.log("leetcode", formData);
+    console.log("formDate 2.O", formData);
     try {
       const response = await habitInput(formData, user);
       const updatedDataToSlice = {
@@ -111,6 +110,9 @@ const TrackerPage = () => {
         lastHabitDate: response.user.lastHabitDate,
       };
       console.log(response);
+      const scoreRes = await getScore(userToken);
+      console.log("score response data: ", scoreRes);
+
       if (
         response.message === "Habit data cleared for today. Streak decreased."
       ) {

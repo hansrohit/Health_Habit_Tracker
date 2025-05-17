@@ -243,7 +243,7 @@ router.get("/reminder-status/:userId", async (req, res) => {
 router.post("/logout", async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken)
-    return res.Status(400).json({ message: "refresh token is required" });
+    return res.status(400).json({ message: "refresh token is required" });
 
   try {
     const deleted = await Token.findOneAndDelete({ refreshToken });
@@ -259,17 +259,21 @@ router.post("/logout", async (req, res) => {
 });
 
 router.put("/score", protect, async (req, res) => {
-  const userId = req.user.id;
+  const ans = moment().startOf("day");
+  console.log(ans);
+
   try {
-    const today = moment().startOf("day").toDate();
-    const tomorrow = moment().startOf("day").toDate();
+    const userId = req.user.id;
+    const today = moment().startOf("day");
+    const tomorrow = moment().endOf("day");
+    const user = await User.findById(userId);
     const response = await habit.findOne({
       user: userId,
       date: { $gte: today, $lte: tomorrow },
     });
     if (!response) {
       const score = 0;
-      return res.status(404).json({ message: "habit not found", data: score });
+      return res.status(404).json({ message: "habit not found", score: score });
     }
 
     const sleep = response.sleep;
@@ -334,9 +338,11 @@ router.put("/score", protect, async (req, res) => {
       workoutScore = workoutScore * 0.25;
 
       const totalScore = sleepScore + waterScore + mealScore + workoutScore;
+      user.score = Math.round(totalScore);
+      await user.save();
       return res
         .status(200)
-        .json({ message: "score data successfully fetched", data: totalScore });
+        .json({ message: "score data successfully fetched", user: user });
     }
   } catch (error) {
     console.log("score backend error: ", error);

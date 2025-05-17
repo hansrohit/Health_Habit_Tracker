@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  score: {
+    type: Number,
+    default: 0,
+  },
 });
 
 userSchema.pre("save", async function (next) {

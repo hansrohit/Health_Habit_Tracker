@@ -105,3 +105,20 @@ export const updateDailyStreak = async (user) => {
     console.log("update streak error in api: ", error);
   }
 };
+
+export const getScore = async (accessToken) => {
+  try {
+    const response = await axios.put(
+      `${API_URL}/api/users/score`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log("api score error: ", error);
+  }
+};
