@@ -117,7 +117,7 @@ export const getScore = async (accessToken) => {
         },
       }
     );
-    return response;
+    return response.data;
   } catch (error) {
     console.log("api score error: ", error);
   }

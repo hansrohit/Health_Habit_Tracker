@@ -104,29 +104,55 @@ const TrackerPage = () => {
     console.log("formDate 2.O", formData);
     try {
       const response = await habitInput(formData, user);
+      console.log(response);
+      const scoreRes = await getScore(userToken);
+      console.log("score response data: ", scoreRes);
       const updatedDataToSlice = {
         currentStreak: response.user.currentStreak,
         maxStreak: response.user.maxStreak,
         lastHabitDate: response.user.lastHabitDate,
+        score: scoreRes.user.score,
       };
-      console.log(response);
-      const scoreRes = await getScore(userToken);
-      console.log("score response data: ", scoreRes);
 
       if (
         response.message === "Habit data cleared for today. Streak decreased."
       ) {
         dispatch(clearHabitData());
-        // dispatch(updateProfile(updatedDataToSlice));
-        // dispatch(fetchUserProfile());
       } else if (
         response.message === "Habit data updated successfully" ||
         response.message === "Habit data added successfully and streak updated"
       ) {
         dispatch(updateHabitData(formData));
       }
-      dispatch(fetchUserProfile());
+      const user1 = {
+        id: scoreRes.user._id,
+        name: scoreRes.user.name,
+        email: scoreRes.user.email,
+        age: scoreRes.user.age,
+        weight: scoreRes.user.weight,
+        height: scoreRes.user.height,
+        goals: scoreRes.user.goals,
+        currentStreak: scoreRes.user.currentStreak,
+        maxStreak: scoreRes.user.maxStreak,
+        remainderTime: scoreRes.user.reminderTime,
+        remainderEnabled: scoreRes.user.reminderEnabled,
+        lastHabitDate: scoreRes.user.lastHabitDate,
+        score: scoreRes.user.score,
+      };
       dispatch(updateProfile(updatedDataToSlice));
+      dispatch(fetchUserProfile());
+      console.log(
+        "userProfile after deletion: ",
+        localStorage.getItem("userProfile")
+      );
+      localStorage.setItem("userProfile", JSON.stringify({ user: user1 }));
+      console.log("userProfile recreation1: ", user1);
+      console.log("userProfile recreation2: ", { user: user1 });
+      console.log(
+        "userProfile recreation3: ",
+        localStorage.getItem("userProfile")
+      );
+
       toast({
         title: response.message,
         status: "success",

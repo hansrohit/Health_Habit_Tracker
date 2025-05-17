@@ -165,6 +165,7 @@ router.put("/update-profile/:id", async (req, res) => {
         currentStreak: user.currentStreak,
         maxStreak: user.maxStreak,
         lastHabitDate: user.lastHabitDate,
+        score: user.score,
       },
     });
   } catch (err) {
@@ -195,6 +196,7 @@ router.get("/profile", protect, async (req, res) => {
         remainderTime: user.reminderTime,
         remainderEnabled: user.reminderEnabled,
         lastHabitDate: user.lastHabitDate,
+        score: user.score,
       },
     });
   } catch (err) {
@@ -271,9 +273,11 @@ router.put("/score", protect, async (req, res) => {
       user: userId,
       date: { $gte: today, $lte: tomorrow },
     });
-    if (!response) {
+    if (!response || response === undefined) {
       const score = 0;
-      return res.status(404).json({ message: "habit not found", score: score });
+      user.score = score;
+      await user.save();
+      return res.status(200).json({ message: "habit not found", user: user });
     }
 
     const sleep = response.sleep;
@@ -336,14 +340,13 @@ router.put("/score", protect, async (req, res) => {
       if (workoutScore > 100) workoutScore = 100;
 
       workoutScore = workoutScore * 0.25;
-
-      const totalScore = sleepScore + waterScore + mealScore + workoutScore;
-      user.score = Math.round(totalScore);
-      await user.save();
-      return res
-        .status(200)
-        .json({ message: "score data successfully fetched", user: user });
     }
+    const totalScore = sleepScore + waterScore + mealScore + workoutScore;
+    user.score = Math.round(totalScore);
+    await user.save();
+    return res
+      .status(200)
+      .json({ message: "score data successfully fetched", user: user });
   } catch (error) {
     console.log("score backend error: ", error);
     res.status(500).json({ message: "error in the score base", error: error });

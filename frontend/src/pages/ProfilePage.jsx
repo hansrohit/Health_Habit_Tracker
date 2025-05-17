@@ -15,7 +15,7 @@ import {
 import { FaFire, FaHeartbeat, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser, updateUserProfile } from "../services/api";
+import { getScore, logoutUser, updateUserProfile } from "../services/api";
 import { logout, updateProfile } from "../state/slice/authSlice";
 import { clearProfile, fetchUserProfile } from "../state/slice/profileSlice";
 import { clearHabitData } from "../state/slice/habitTrackerSlice";
@@ -23,6 +23,7 @@ import { clearHabitData } from "../state/slice/habitTrackerSlice";
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.profile);
+  const { userToken } = useSelector((state) => state.auth);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -101,6 +102,7 @@ const ProfilePage = () => {
         remainderTime: res.user.reminderTime,
         remainderEnabled: res.user.reminderEnabled,
         lastHabitDate: res.user.lastHabitDate,
+        score: res.user.score,
       };
       dispatch(updateProfile(user1));
       dispatch(fetchUserProfile());
@@ -124,6 +126,48 @@ const ProfilePage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const scoreUpdation = async () => {
+      try {
+        const scoreRes = await getScore(userToken);
+        const user2 = {
+          id: scoreRes.user._id,
+          name: scoreRes.user.name,
+          email: scoreRes.user.email,
+          age: scoreRes.user.age,
+          weight: scoreRes.user.weight,
+          height: scoreRes.user.height,
+          goals: scoreRes.user.goals,
+          currentStreak: scoreRes.user.currentStreak,
+          maxStreak: scoreRes.user.maxStreak,
+          remainderTime: scoreRes.user.reminderTime,
+          remainderEnabled: scoreRes.user.reminderEnabled,
+          lastHabitDate: scoreRes.user.lastHabitDate,
+          score: scoreRes.user.score,
+        };
+        console.log("profile score response: ", scoreRes);
+
+        dispatch(updateProfile(user2));
+        dispatch(fetchUserProfile());
+        console.log(
+          "userProfile after deletion - profile: ",
+          localStorage.getItem("userProfile")
+        );
+        localStorage.setItem("userProfile", JSON.stringify({ user: user2 }));
+        console.log("userProfile recreation1 - profile: ", user2);
+        console.log("userProfile recreation2 - profile: ", { user: user2 });
+        console.log(
+          "userProfile recreation3 - profile: ",
+          localStorage.getItem("userProfile")
+        );
+      } catch (error) {
+        console.log("Error in the profile score updation api calling: ", error);
+      }
+    };
+
+    scoreUpdation();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -417,10 +461,10 @@ const ProfilePage = () => {
                   fontStyle="italic"
                   color="gray.500"
                 >
-                  HEALTH SCORE
+                  DAILY SCORE
                 </Text>
                 <Text mt={2} fontSize="lg" color="red.600" fontWeight="bold">
-                  11
+                  {user.user.score} / 100
                 </Text>
               </Box>
               <Box
